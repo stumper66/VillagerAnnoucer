@@ -1,0 +1,19 @@
+name: 'VillagerAnnouncer'
+version: '${version}'
+description: '${description}'
+authors: [ 'PenalBuffalo' ]
+website: 'https://github.com/stumper66/VillagerAnnouncer'
+
+main: 'io.github.stumper66.villagerannouncer.VillagerAnnouncer'
+api-version: '1.16'
+load: 'POSTWORLD'
+
+commands:
+  villagerannouncer:
+    description: Manage Villager Announcer
+    aliases: [ va ]
+
+permissions:
+  villagerannouncer.*:
+    description: 'Access to all Villager Announcer commands.'
+    default: op

@@ -1,0 +1,16 @@
+# JetBrains IntelliJ
+target/
+.idea/
+*.iml
+
+# Eclipse
+.classpath
+.project
+/.settings
+/.idea/
+.idea/jarRepositories.xml
+.idea/discord.xml
+
+# macOS
+._.git
+.DS_Store
