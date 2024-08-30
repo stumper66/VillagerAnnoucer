@@ -129,7 +129,6 @@ public class VillagerDeath {
         final String message = MessageUtils.colorizeAll(text);
         for (Player player : Bukkit.getOnlinePlayers()){
             if (!checkWorldPermissions(player, allowedWorlds)) continue;
-            Log.inf("requiresPermissions: " + requiresPermissions + ", has perms: " + player.hasPermission(permissionName));
             if (requiresPermissions && !player.hasPermission(permissionName)) continue;
 
             player.sendMessage(message);
