@@ -114,24 +114,34 @@ public class VillagerDeath {
         runBroadcast(mainMessage.text);
     }
 
-    private void runBroadcast(final String text){
+    private void runBroadcast(final String text) {
         final VillagerAnnouncer main = VillagerAnnouncer.getInstance();
 
         final List<String> allowedWorlds = main.config.getStringList("broadcast-worlds");
-        if (!allowedWorlds.isEmpty()){
+        if (!allowedWorlds.isEmpty()) {
             final String temp = main.config.getString("broadcast-worlds");
             if (temp != null && !temp.isEmpty())
                 allowedWorlds.add(temp);
         }
         final String permissionName = "villagerannouncer.receive-broadcasts";
         final boolean requiresPermissions = main.config.getBoolean("players-require-premissions");
-
+        final boolean useBroadcast = (allowedWorlds.isEmpty() || allowedWorlds.contains("*")) && !requiresPermissions;
         final String message = MessageUtils.colorizeAll(text);
+
+        if (useBroadcast) {
+            Bukkit.broadcastMessage(message);
+            if (main.discordSRVManager.getIsInstalled())
+                main.discordSRVManager.sendMessage(message);
+            if (!main.playSound) return;
+        }
+        else if (main.config.getBoolean("log-messages-to-console"))
+            Log.inf(message);
+
         for (Player player : Bukkit.getOnlinePlayers()){
             if (!checkWorldPermissions(player, allowedWorlds)) continue;
             if (requiresPermissions && !player.hasPermission(permissionName)) continue;
 
-            player.sendMessage(message);
+            if (!useBroadcast) player.sendMessage(message);
 
             if (main.playSound && main.soundToPlay != null)
                 player.playSound(player, main.soundToPlay, 1f, 1f);

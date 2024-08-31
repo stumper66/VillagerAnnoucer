@@ -8,6 +8,9 @@ main: 'io.github.stumper66.villagerannouncer.VillagerAnnouncer'
 api-version: '1.16'
 load: 'POSTWORLD'
 
+softdepend:
+  - DiscordSRV
+
 commands:
   villagerannouncer:
     description: Manage Villager Announcer

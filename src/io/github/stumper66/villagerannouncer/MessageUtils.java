@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.0.0
  */
 public class MessageUtils {
-    private static boolean isRunningSpigot = true;
+    private static boolean isRunningSpigot;
 
     static {
         isRunningSpigot = false;

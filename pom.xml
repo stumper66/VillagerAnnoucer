@@ -6,7 +6,7 @@
 
     <groupId>io.github.stumper66</groupId>
     <artifactId>VillagerAnnoucer</artifactId>
-    <version>1.0.1</version>
+    <version>1.1</version>
     <packaging>jar</packaging>
 
     <name>VillagerAnnouncer</name>
@@ -55,6 +55,10 @@
             <name>Maven Central</name>
             <url>https://repo.maven.apache.org/maven2/</url>
         </repository>
+        <repository>
+            <id>Scarsz-Nexus</id>
+            <url>https://nexus.scarsz.me/content/groups/public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -69,6 +73,12 @@
             <artifactId>annotations</artifactId>
             <version>24.1.0</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.discordsrv</groupId>
+            <artifactId>discordsrv</artifactId>
+            <version>1.28.0</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
