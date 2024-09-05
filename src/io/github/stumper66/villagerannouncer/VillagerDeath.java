@@ -9,6 +9,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class VillagerDeath {
     private final LivingEntity entity;
     private VillagerInfo info;
     public boolean wasInfected;
+    private String villagerTradedIds = "";
 
     public void run(){
         final EventListeners eventListeners = EventListeners.getInstance();
@@ -124,8 +126,10 @@ public class VillagerDeath {
                 allowedWorlds.add(temp);
         }
         final String permissionName = "villagerannouncer.receive-broadcasts";
+        final int maxRadius = main.config.getInt("max-broadcast-radius");
         final boolean requiresPermissions = main.config.getBoolean("players-require-premissions");
-        final boolean useBroadcast = (allowedWorlds.isEmpty() || allowedWorlds.contains("*")) && !requiresPermissions;
+        final boolean useBroadcast = (allowedWorlds.isEmpty() || allowedWorlds.contains("*"))
+                && !requiresPermissions && !main.onlyBroadcastIfTradedWith && maxRadius <= 0;
         final String message = MessageUtils.colorizeAll(text);
 
         if (useBroadcast) {
@@ -137,15 +141,38 @@ public class VillagerDeath {
         else if (main.config.getBoolean("log-messages-to-console"))
             Log.inf(message);
 
+        if (main.onlyBroadcastIfTradedWith){
+            if (entity.getPersistentDataContainer().has(main.keyTraders, PersistentDataType.STRING))
+                villagerTradedIds = entity.getPersistentDataContainer().get(main.keyTraders, PersistentDataType.STRING);
+            else
+                villagerTradedIds = "";
+        }
+
         for (Player player : Bukkit.getOnlinePlayers()){
+            if (main.onlyBroadcastIfTradedWith && !hadPlayerTradedWith(player)) continue;
             if (!checkWorldPermissions(player, allowedWorlds)) continue;
             if (requiresPermissions && !player.hasPermission(permissionName)) continue;
+            if (maxRadius > 0 && !checkPlayerRadius(player, maxRadius)) continue;
 
             if (!useBroadcast) player.sendMessage(message);
 
             if (main.playSound && main.soundToPlay != null)
-                player.playSound(player, main.soundToPlay, 1f, 1f);
+                player.playSound(player.getLocation(), main.soundToPlay, 1f, 1f);
         }
+    }
+
+    private boolean hadPlayerTradedWith(final @NotNull Player player){
+        boolean temp = villagerTradedIds.contains(player.getUniqueId().toString());
+        if (villagerTradedIds.isEmpty()) return false;
+        return villagerTradedIds.contains(player.getUniqueId().toString());
+    }
+
+    private boolean checkPlayerRadius(final @NotNull Player player, final int maxRadius){
+        if (entity.getWorld() != player.getWorld()) return false;
+
+        final double distance = player.getLocation().distance(entity.getLocation());
+        final int distanceInt = (int)Math.ceil(distance);
+        return distanceInt <= maxRadius;
     }
 
     private boolean checkWorldPermissions(final @NotNull Player player, final @NotNull List<String> allowedWorlds){

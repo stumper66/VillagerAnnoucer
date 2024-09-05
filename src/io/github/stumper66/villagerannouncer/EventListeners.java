@@ -48,7 +48,7 @@ public class EventListeners implements Listener {
 
         if (event.getEntity().getType() == EntityType.ZOMBIE_VILLAGER){
             final boolean wasPreviouslyNormalVillager = event.getEntity().getPersistentDataContainer().has(
-                    VillagerAnnouncer.getInstance().key,
+                    VillagerAnnouncer.getInstance().keyWasVillager,
                     PersistentDataType.INTEGER
             );
 
@@ -79,7 +79,7 @@ public class EventListeners implements Listener {
         entitiesThatHurtVillagers.put(event.getEntity().getUniqueId(), damager);
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onEntityTransformEvent(final @NotNull EntityTransformEvent event){
         if (!VillagerAnnouncer.getInstance().isEnabled) return;
         if (event.getEntity().getType() != EntityType.VILLAGER) return;
@@ -87,7 +87,7 @@ public class EventListeners implements Listener {
 
         for (final Entity entity : event.getTransformedEntities()){
             entity.getPersistentDataContainer().set(
-                    VillagerAnnouncer.getInstance().key,
+                    VillagerAnnouncer.getInstance().keyWasVillager,
                     PersistentDataType.INTEGER,
                     1
             );

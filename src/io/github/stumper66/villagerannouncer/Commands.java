@@ -31,7 +31,7 @@ public class Commands implements CommandExecutor, TabCompleter {
             return;
         }
 
-        VillagerAnnouncer.getInstance().loadConfig();
+        VillagerAnnouncer.getInstance().loadConfig(sender);
         VillagerAnnouncer.getInstance().discordSRVManager.reset();
         sender.sendMessage("Reloaded the config");
     }

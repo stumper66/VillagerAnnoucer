@@ -2,6 +2,12 @@ enabled: true
 play-sound: true
 sound-name: 'ENTITY_VILLAGER_DEATH'
 
+# use 0 for unlimited radius
+max-broadcast-radius: 0
+# if you're traded with a villager previously then you will get notified
+# note this is only compatible on Paper servers
+only-broadcast-if-traded-with: false
+# optionally limit broadcasts to specific worlds
 broadcast-worlds: ['*']
 # only broadcasts if they were formally normal villagers
 broadcast-zombie-villager-deaths: true
@@ -42,4 +48,4 @@ messages:
 # %villager-experience%
 # %villager-type%
 
-file-version: 2
+file-version: 3

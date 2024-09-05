@@ -22,6 +22,12 @@ public class Log {
         return isRunningSpigot;
     }
 
+    // use this function for testing messages so you will remember to remove them later
+    @Deprecated()
+    public static void infTemp(final String text) {
+        inf(text);
+    }
+
     public static void inf(final String text){
         if (getIsRunningSpigot()) {
             Bukkit.getServer().getConsoleSender().sendMessage(MessageUtils.colorizeAll(PREFIX + text));
