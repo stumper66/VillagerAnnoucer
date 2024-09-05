@@ -9,11 +9,22 @@ enabled: true
 play-sound: true
 sound-name: 'ENTITY_VILLAGER_DEATH'
 
+# use 0 for unlimited radius
+max-broadcast-radius: 0
+# if you're traded with a villager previously then you will get notified
+# note this is only compatible on Paper servers
+only-broadcast-if-traded-with: false
+# optionally limit broadcasts to specific worlds
 broadcast-worlds: ['*']
 # only broadcasts if they were formally normal villagers
 broadcast-zombie-villager-deaths: true
 # villagerannouncer.receive-broadcasts
 players-require-premissions: false
+# if DiscordSRV is installed then send any messages to the main text channel
+discordsrv-send-message-to-main-channel: true
+# this is only applicable if you have world filtering
+# or are using player permisisons
+log-messages-to-console: true
 
 messages:
   # all four of these settings will populate the %villager% variable:
@@ -44,7 +55,7 @@ messages:
 # %villager-experience%
 # %villager-type%
 
-file-version: 1
+file-version: 3
 ```
 
 Questions or feature suggestions? Join the [discord](https://discord.gg/arcaneplugins-752310043214479462) server.
