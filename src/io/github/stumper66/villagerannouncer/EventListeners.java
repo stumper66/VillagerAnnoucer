@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public class EventListeners implements Listener {
     public EventListeners(){
         instance = this;
@@ -96,6 +97,7 @@ public class EventListeners implements Listener {
         lastEntryTime = Instant.now();
         transformedVillagers.add(event.getEntity().getUniqueId());
         final VillagerDeath villagerDeath = new VillagerDeath((LivingEntity) event.getEntity());
+
         villagerDeath.wasInfected = true;
         villagerDeath.run();
     }

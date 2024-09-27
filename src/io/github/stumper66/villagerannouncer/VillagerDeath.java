@@ -41,6 +41,9 @@ public class VillagerDeath {
         if (info.killerEntity != null && info.killerEntity.getUniqueId() == entity.getUniqueId())
             info.killerEntity = null;
 
+        if (info.killerEntity == null && eventListeners.entitiesThatHurtVillagers.containsKey(entity.getUniqueId()))
+            info.killerEntity = eventListeners.entitiesThatHurtVillagers.get(entity.getUniqueId());
+
         info.damageEvent = entity.getLastDamageCause();
 
         if (!wasInfected && !(info.killerEntity instanceof Player)) {
@@ -73,7 +76,7 @@ public class VillagerDeath {
         else if (info.isNormalVillager && !info.isAdult)
             villager = messages.getString("baby-villager", "baby villager");
         else if (!info.isNormalVillager && info.isAdult)
-            villager = messages.getString(" zombie-villager", "zombie villager");
+            villager = messages.getString("zombie-villager", "zombie villager");
         else
             villager = messages.getString("baby-zombie-villager", "baby zombie villager");
 
@@ -95,25 +98,48 @@ public class VillagerDeath {
         else if (info.damageCause != null)
             messageTemplate = messages.getString("death-by-misc", "&eA %villager% died by %death-cause% %location%");
         else if (info.hasProfession())
-            messageTemplate = messages.getString("villager-infection-with-profession", "&eA %villager% has been infected! Profession: %villager-profession%, level: %villager-level% %location%");
+            messageTemplate = messages.getString("villager-infection-with-profession", "&eA %villager% has been infected by %entity%! Profession: %villager-profession%, level: %villager-level% %location%");
         else // no infection regular death
-            messageTemplate = messages.getString("villager-infection", "&eA %villager% has been infected! %location%");
+            messageTemplate = messages.getString("villager-infection", "&eA %villager% has been infected by %entity%! %location%");
 
         final StringReplacer mainMessage = new StringReplacer(messageTemplate);
         mainMessage.replaceIfExists("%location%", () -> location.text);
         mainMessage.replaceIfExists("%villager%", () -> villager);
-        mainMessage.replaceIfExists("%death-cause%", () -> info.damageCause != null ? info.damageCause.name() : "");
+        mainMessage.replaceIfExists("%death-cause%", () -> info.damageCause != null ? capitalize(info.damageCause.name()) : "");
         mainMessage.replaceIfExists("%entity%", () -> {
             if (info.killerEntity == null) return "";
             if (info.killerEntity instanceof Player player) return player.getName();
-            return info.killerEntity.getCustomName() != null ? info.killerEntity.getCustomName() : info.killerEntity.getType().name();
+            return info.killerEntity.getCustomName() != null ? info.killerEntity.getCustomName() : capitalize(info.killerEntity.getType().name());
         });
-        mainMessage.replaceIfExists("%villager-profession%", () -> info.hasProfession() ? info.getProfession().name() : "");
+        mainMessage.replaceIfExists("%villager-profession%", () -> info.hasProfession() ? capitalize(info.getProfession().name()) : "");
         mainMessage.replaceIfExists("%villager-level%", () -> String.valueOf(info.getVillagerLevel()));
         mainMessage.replaceIfExists("%villager-experience%", () -> String.valueOf(info.getVillagerExperience()));
-        mainMessage.replaceIfExists("%villager-type%", () -> info.getVillagerType().name());
+        mainMessage.replaceIfExists("%villager-type%", () -> capitalize(info.getVillagerType().name()));
 
         runBroadcast(mainMessage.text);
+    }
+
+    private @NotNull String capitalize(@NotNull final String str) {
+        final StringBuilder builder = new StringBuilder();
+        final String[] words = str.toLowerCase().split(" "); // each word separated from str
+        for (int i = 0; i < words.length; i++) {
+            final String word = words[i];
+            if (word.isEmpty()) {
+                continue;
+            }
+
+            builder.append(String.valueOf(word.charAt(0)).toUpperCase()); // capitalize first letter
+            if (word.length() > 1) {
+                builder.append(word.substring(1)); // append the rest of the word
+            }
+
+            // if there is another word to capitalize, then add a space
+            if (i < words.length - 1) {
+                builder.append(" ");
+            }
+        }
+
+        return builder.toString();
     }
 
     private void runBroadcast(final String text) {
@@ -162,7 +188,6 @@ public class VillagerDeath {
     }
 
     private boolean hadPlayerTradedWith(final @NotNull Player player){
-        boolean temp = villagerTradedIds.contains(player.getUniqueId().toString());
         if (villagerTradedIds.isEmpty()) return false;
         return villagerTradedIds.contains(player.getUniqueId().toString());
     }

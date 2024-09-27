@@ -83,7 +83,7 @@ public class VillagerAnnouncer extends JavaPlugin {
         config.options().copyDefaults(true);
         final int fileVersion = config.getInt("file-version");
 
-        if (fileVersion < 3){
+        if (fileVersion < 4){
             // copy to old file
             final File backedupFile = new File(getDataFolder(),
                     "config.yml.v" + fileVersion + ".old");
