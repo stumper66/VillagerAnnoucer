@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -44,8 +45,7 @@ public class EventListeners implements Listener {
     @EventHandler(priority = EventPriority.NORMAL)
     public void onEntityDeathEvent(final @NotNull EntityDeathEvent event){
         if (!VillagerAnnouncer.getInstance().isEnabled) return;
-        if (!typesWeCareAbout.contains(event.getEntity().getType()))
-            return;
+        if (!typesWeCareAbout.contains(event.getEntity().getType())) return;
 
         if (event.getEntity().getType() == EntityType.ZOMBIE_VILLAGER){
             final boolean wasPreviouslyNormalVillager = event.getEntity().getPersistentDataContainer().has(
@@ -66,7 +66,14 @@ public class EventListeners implements Listener {
     public void onEntityDamageEvent(final @NotNull EntityDamageByEntityEvent event){
         if (!VillagerAnnouncer.getInstance().isEnabled) return;
         if (!typesWeCareAbout.contains(event.getEntity().getType())) return;
-        if (!(event.getDamager() instanceof LivingEntity damager)) return;
+
+        LivingEntity damager;
+        if (event.getDamager() instanceof LivingEntity livingDamager)
+            damager = livingDamager;
+        else if (event.getDamager() instanceof Projectile projectileDamager)
+            damager = (LivingEntity) projectileDamager.getShooter();
+        else
+            return;
 
         if (lastEntryTime != null){
             final long howLongMS = Duration.between(lastEntryTime, Instant.now()).toMillis();

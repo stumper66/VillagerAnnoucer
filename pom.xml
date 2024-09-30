@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.stumper66</groupId>
-    <artifactId>VillagerAnnoucer</artifactId>
-    <version>1.3</version>
+    <artifactId>VillagerAnnouncer</artifactId>
+    <version>1.3.1</version>
     <packaging>jar</packaging>
 
     <name>VillagerAnnouncer</name>
