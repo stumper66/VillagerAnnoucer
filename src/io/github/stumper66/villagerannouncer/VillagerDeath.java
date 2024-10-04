@@ -1,5 +1,7 @@
 package io.github.stumper66.villagerannouncer;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
@@ -156,16 +158,16 @@ public class VillagerDeath {
         final boolean requiresPermissions = main.config.getBoolean("players-require-premissions");
         final boolean useBroadcast = (allowedWorlds.isEmpty() || allowedWorlds.contains("*"))
                 && !requiresPermissions && !main.onlyBroadcastIfTradedWith && maxRadius <= 0;
-        final String message = MessageUtils.colorizeAll(text);
+        final Component comp = MiniMessage.miniMessage().deserialize(text);
 
         if (useBroadcast) {
-            Bukkit.broadcastMessage(message);
             if (main.discordSRVManager.getIsInstalled())
-                main.discordSRVManager.sendMessage(message);
-            if (!main.playSound) return;
+                main.discordSRVManager.sendMessage(comp);
         }
-        else if (main.config.getBoolean("log-messages-to-console"))
-            Log.inf(message);
+
+        if (main.config.getBoolean("log-messages-to-console")){
+            main.adventure.console().sendMessage(comp);
+        }
 
         if (main.onlyBroadcastIfTradedWith){
             if (entity.getPersistentDataContainer().has(main.keyTraders, PersistentDataType.STRING))
@@ -180,7 +182,7 @@ public class VillagerDeath {
             if (requiresPermissions && !player.hasPermission(permissionName)) continue;
             if (maxRadius > 0 && !checkPlayerRadius(player, maxRadius)) continue;
 
-            if (!useBroadcast) player.sendMessage(message);
+            main.adventure.player(player).sendMessage(comp);
 
             if (main.playSound && main.soundToPlay != null)
                 player.playSound(player.getLocation(), main.soundToPlay, 1f, 1f);

@@ -1,7 +1,8 @@
 package io.github.stumper66.villagerannouncer;
 
 import github.scarsz.discordsrv.DiscordSRV;
-import github.scarsz.discordsrv.util.MessageUtil;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -18,7 +19,7 @@ public class DiscordSRVManager {
         return isInstalled;
     }
 
-    public void sendMessage(final String message){
+    public void sendMessage(final Component component){
         final var mainChannel = DiscordSRV.getPlugin().getMainTextChannel();
         if (mainChannel == null){
             if (!mainChannelWasNull){
@@ -28,9 +29,8 @@ public class DiscordSRVManager {
             return;
         }
 
-        mainChannel.sendMessage(
-                MessageUtil.strip(message)
-        ).queue();
+        final String text = PlainTextComponentSerializer.plainText().serialize(component);
+        mainChannel.sendMessage(text).queue();
     }
 
     public void reset(){

@@ -1,5 +1,6 @@
 package io.github.stumper66.villagerannouncer;
 
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -25,6 +26,7 @@ public class VillagerAnnouncer extends JavaPlugin {
     private boolean isRunningPaper;
     Sound soundToPlay;
     DiscordSRVManager discordSRVManager;
+    public BukkitAudiences adventure;
 
     @Override
     public void onLoad() {
@@ -33,6 +35,7 @@ public class VillagerAnnouncer extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        this.adventure = BukkitAudiences.create(this);
         keyWasVillager = new NamespacedKey(this, "wasvillager");
         keyTraders = new NamespacedKey(this, "traders");
         checkForPaper();
@@ -83,7 +86,7 @@ public class VillagerAnnouncer extends JavaPlugin {
         config.options().copyDefaults(true);
         final int fileVersion = config.getInt("file-version");
 
-        if (fileVersion < 4){
+        if (fileVersion < 5){
             // copy to old file
             final File backedupFile = new File(getDataFolder(),
                     "config.yml.v" + fileVersion + ".old");
@@ -130,6 +133,9 @@ public class VillagerAnnouncer extends JavaPlugin {
 
     @Override
     public void onDisable() {
-
+        if (this.adventure != null) {
+            this.adventure.close();
+            this.adventure = null;
+        }
     }
 }
