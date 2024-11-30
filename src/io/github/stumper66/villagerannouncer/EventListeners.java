@@ -27,7 +27,7 @@ import java.util.UUID;
 public class EventListeners implements Listener {
     public EventListeners(){
         instance = this;
-        typesWeCareAbout = List.of(EntityType.VILLAGER, EntityType.ZOMBIE_VILLAGER);
+        typesWeCareAbout = List.of(EntityType.VILLAGER, EntityType.ZOMBIE_VILLAGER, EntityType.WANDERING_TRADER);
         entitiesThatHurtVillagers = new LinkedHashMap<>();
         transformedVillagers = new HashSet<>();
     }
@@ -54,6 +54,11 @@ public class EventListeners implements Listener {
             );
 
             if (!wasPreviouslyNormalVillager) return;
+        }
+
+        if (event.getEntity().getType() == EntityType.WANDERING_TRADER){
+            if (VillagerAnnouncer.getInstance().config.getBoolean("include-wandering-trader"))
+                return;
         }
 
         // the transform event occurs after the death event

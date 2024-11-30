@@ -1,6 +1,7 @@
 enabled: true
 play-sound: true
 sound-name: 'ENTITY_VILLAGER_DEATH'
+sound-name-wandering-trader: 'ENTITY_WANDERING_TRADER_DEATH'
 
 # use 0 for unlimited radius
 max-broadcast-radius: 0
@@ -19,6 +20,8 @@ discordsrv-send-message-to-main-channel: true
 # or are using player permisisons
 log-messages-to-console: true
 
+include-wandering-trader: false
+
 # messages are formatted with MiniMessage
 # for information go to https://docs.advntr.dev/minimessage/format.html
 messages:
@@ -27,6 +30,7 @@ messages:
   baby-villager: 'baby villager'
   zombie-villager: 'zombie villager'
   baby-zombie-villager: 'baby zombie villager'
+  wandering-trader: 'wandering trader'
 
   # populates %location% variable:
   location: '<reset>( <color:gold>XYZ: %x% %y% %z%, <color:yellow>in <color:green>%world-name%</color>)'
@@ -39,6 +43,9 @@ messages:
   villager-infection: '<color:yellow>A %villager% has been infected by %entity%! %location%'
   death-by-entity: '<color:yellow>A %villager% was killed by %entity% %location%'
   death-by-misc: '<color:yellow>A %villager% died by %death-cause% %location%'
+
+  wandering-trader-death: '<color:yellow>A %wandering-trader% has died! %location%'
+  wandering-trader-death-by-entity: '<color:yellow>A %wandering-trader% was brutally murdered by <color:red>%entity%<color:yellow>! %location%'
 
 # Available variables:
 # %villager%
@@ -53,4 +60,4 @@ messages:
 # %villager-experience%
 # %villager-type%
 
-file-version: 5
+file-version: 6

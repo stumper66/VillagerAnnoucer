@@ -24,7 +24,8 @@ public class VillagerAnnouncer extends JavaPlugin {
     boolean isEnabled;
     boolean onlyBroadcastIfTradedWith;
     private boolean isRunningPaper;
-    Sound soundToPlay;
+    Sound soundToPlayNormal;
+    Sound soundToPlayWanderingTrader;
     DiscordSRVManager discordSRVManager;
     public BukkitAudiences adventure;
 
@@ -86,7 +87,7 @@ public class VillagerAnnouncer extends JavaPlugin {
         config.options().copyDefaults(true);
         final int fileVersion = config.getInt("file-version");
 
-        if (fileVersion < 5){
+        if (fileVersion < 6){
             // copy to old file
             final File backedupFile = new File(getDataFolder(),
                     "config.yml.v" + fileVersion + ".old");
@@ -101,21 +102,8 @@ public class VillagerAnnouncer extends JavaPlugin {
 
         this.isEnabled = config.getBoolean("enabled", true);
         if (!this.isEnabled) Log.inf("Plugin is currently disabled via config");
-        playSound = config.getBoolean("play-sound");
-        if (playSound){
-            final String soundName = config.getString("sound-name");
-            if (soundName == null || soundName.isEmpty())
-                playSound = false;
-            else{
-                try{
-                    soundToPlay = Sound.valueOf(soundName.toUpperCase());
-                }
-                catch (Exception ignored){
-                    Log.war("Invalid sound name: " + soundName);
-                    playSound = false;
-                }
-            }
-        }
+
+        parseSoundConfig();
 
         onlyBroadcastIfTradedWith = config.getBoolean("only-broadcast-if-traded-with");
         if (onlyBroadcastIfTradedWith && !isRunningPaper){
@@ -124,6 +112,37 @@ public class VillagerAnnouncer extends JavaPlugin {
             if (whoReloaded instanceof Player)
                 whoReloaded.sendMessage(MessageUtils.colorizeAll("VillagerAnnouncer: &c") + msg);
             onlyBroadcastIfTradedWith = false;
+        }
+    }
+
+    private void parseSoundConfig(){
+        playSound = config.getBoolean("play-sound");
+        if (!playSound) return;
+
+        final String soundName = config.getString("sound-name");
+        if (soundName == null || soundName.isEmpty())
+            soundToPlayNormal = null;
+        else{
+            try{
+                soundToPlayNormal = Sound.valueOf(soundName.toUpperCase());
+            }
+            catch (Exception ignored){
+                Log.war("Invalid sound name: " + soundName);
+                soundToPlayNormal = null;
+            }
+        }
+
+        final String soundNameWanderingTrader = config.getString("sound-name-wandering-trader");
+        if (soundNameWanderingTrader == null || soundNameWanderingTrader.isEmpty())
+            soundToPlayWanderingTrader = null;
+        else{
+            try{
+                soundToPlayWanderingTrader = Sound.valueOf(soundNameWanderingTrader.toUpperCase());
+            }
+            catch (Exception ignored){
+                Log.war("Invalid sound name (wandering trader): " + soundNameWanderingTrader);
+                soundToPlayWanderingTrader = null;
+            }
         }
     }
 
