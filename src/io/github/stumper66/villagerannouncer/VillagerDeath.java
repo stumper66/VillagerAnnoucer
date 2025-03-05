@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Ageable;
@@ -196,7 +197,7 @@ public class VillagerDeath {
                 villagerTradedIds = "";
         }
 
-        for (Player player : Bukkit.getOnlinePlayers()){
+        for (final Player player : Bukkit.getOnlinePlayers()){
             if (main.onlyBroadcastIfTradedWith && !hadPlayerTradedWith(player)) continue;
             if (!checkWorldPermissions(player, allowedWorlds)) continue;
             if (requiresPermissions && !player.hasPermission(permissionName)) continue;
@@ -205,12 +206,13 @@ public class VillagerDeath {
             main.adventure.player(player).sendMessage(comp);
 
             if (main.playSound){
-                if (info.isWanderingTrader && main.soundToPlayWanderingTrader != null)
-                    player.playSound(player.getLocation(), main.soundToPlayWanderingTrader, 1f, 1f);
-                else if (!info.isWanderingTrader && main.soundToPlayNormal != null)
-                    player.playSound(player.getLocation(), main.soundToPlayNormal, 1f, 1f);
-            }
+                final SoundInfo soundInfo = info.isNormalVillager ?
+                        main.soundsNormal : main.soundsWanderingTrader;
+                final Sound sound = soundInfo.getSoundToBePlayed();
 
+                if (sound != null)
+                    player.playSound(player.getLocation(), sound, 1f, 1f);
+            }
         }
     }
 

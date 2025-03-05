@@ -10,10 +10,14 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.FileUtil;
+import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 public class VillagerAnnouncer extends JavaPlugin {
     private static VillagerAnnouncer instance;
@@ -24,8 +28,8 @@ public class VillagerAnnouncer extends JavaPlugin {
     boolean isEnabled;
     boolean onlyBroadcastIfTradedWith;
     private boolean isRunningPaper;
-    Sound soundToPlayNormal;
-    Sound soundToPlayWanderingTrader;
+    SoundInfo soundsNormal;
+    SoundInfo soundsWanderingTrader;
     DiscordSRVManager discordSRVManager;
     public BukkitAudiences adventure;
 
@@ -87,7 +91,7 @@ public class VillagerAnnouncer extends JavaPlugin {
         config.options().copyDefaults(true);
         final int fileVersion = config.getInt("file-version");
 
-        if (fileVersion < 6){
+        if (fileVersion < 7){
             // copy to old file
             final File backedupFile = new File(getDataFolder(),
                     "config.yml.v" + fileVersion + ".old");
@@ -116,34 +120,39 @@ public class VillagerAnnouncer extends JavaPlugin {
     }
 
     private void parseSoundConfig(){
+        this.soundsNormal = new SoundInfo();
+        this.soundsWanderingTrader = new SoundInfo();
+
         playSound = config.getBoolean("play-sound");
         if (!playSound) return;
 
-        final String soundName = config.getString("sound-name");
-        if (soundName == null || soundName.isEmpty())
-            soundToPlayNormal = null;
-        else{
-            try{
-                soundToPlayNormal = Sound.valueOf(soundName.toUpperCase());
-            }
-            catch (Exception ignored){
+        this.soundsNormal.soundsToPlay.addAll(parseSounds("sound-name"));
+        this.soundsWanderingTrader.soundsToPlay.addAll(parseSounds("sound-name-wandering-trader"));
+
+        this.soundsNormal.reset();
+        this.soundsWanderingTrader.reset();
+    }
+
+    private @NotNull List<Sound> parseSounds(final String configName){
+        final String soundName = config.getString(configName);
+        final List<String> soundNames = config.getStringList(configName);
+        final List<Sound> results = new LinkedList<>();
+
+        if (soundNames.isEmpty() && (soundName == null || soundName.isEmpty()))
+            return Collections.emptyList();
+        else if (soundNames.isEmpty())
+            soundNames.add(soundName);
+
+        for (final String name : soundNames) {
+            try {
+                Sound sound = Sound.valueOf(name.toUpperCase());
+                results.add(sound);
+            } catch (Exception ignored) {
                 Log.war("Invalid sound name: " + soundName);
-                soundToPlayNormal = null;
             }
         }
 
-        final String soundNameWanderingTrader = config.getString("sound-name-wandering-trader");
-        if (soundNameWanderingTrader == null || soundNameWanderingTrader.isEmpty())
-            soundToPlayWanderingTrader = null;
-        else{
-            try{
-                soundToPlayWanderingTrader = Sound.valueOf(soundNameWanderingTrader.toUpperCase());
-            }
-            catch (Exception ignored){
-                Log.war("Invalid sound name (wandering trader): " + soundNameWanderingTrader);
-                soundToPlayWanderingTrader = null;
-            }
-        }
+        return results;
     }
 
     public static VillagerAnnouncer getInstance(){

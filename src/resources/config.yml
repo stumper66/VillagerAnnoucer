@@ -1,7 +1,14 @@
 enabled: true
 play-sound: true
+
+# can optionally use a list of sounds
 sound-name: 'ENTITY_VILLAGER_DEATH'
 sound-name-wandering-trader: 'ENTITY_WANDERING_TRADER_DEATH'
+# when using a list of sounds, it won't play the same sound
+# twice until all sounds have been played
+do-not-use-already-played-sounds: true
+# when using a sound like should the list be randomized
+randomize-sound-list: true
 
 # use 0 for unlimited radius
 max-broadcast-radius: 0
@@ -60,4 +67,4 @@ messages:
 # %villager-experience%
 # %villager-type%
 
-file-version: 6
+file-version: 7
