@@ -25,6 +25,8 @@ public class Commands implements CommandExecutor, TabCompleter {
 
         if (args.length >= 1 && "reload".equalsIgnoreCase(args[0]))
             doReload(sender);
+        else if (args.length >= 1 && "test-chat".equalsIgnoreCase(args[0]))
+            doTestChat(sender);
         else if (args.length >= 1 && "test-sound".equalsIgnoreCase(args[0])) {
             final String soundName = args.length >= 2 ? args[1] : null;
             doTestSound(sender, soundName);
@@ -34,6 +36,22 @@ public class Commands implements CommandExecutor, TabCompleter {
                     "\nOptions: reload / test-sound");
 
         return true;
+    }
+
+    private void doTestChat(final @NotNull CommandSender sender){
+        if (!sender.hasPermission("villagerannouncer.test-chat")){
+            sender.sendMessage("Access denied");
+            return;
+        }
+
+        final DiscordSRVManager srv = VillagerAnnouncer.getInstance().discordSRVManager;
+
+        if (!srv.getIsInstalled()){
+            sender.sendMessage("DiscordSRV is not installed or enabled");
+            return;
+        }
+
+        srv.sendTestMessage(sender);
     }
 
     private void doTestSound(final @NotNull CommandSender sender, final @Nullable String soundName){
@@ -84,6 +102,8 @@ public class Commands implements CommandExecutor, TabCompleter {
                 suggestions.add("reload");
             if (sender.hasPermission("villagerannouncer.test-sound"))
                 suggestions.add("test-sound");
+            if (sender.hasPermission("villagerannouncer.test-chat"))
+                suggestions.add("test-chat");
 
             return suggestions;
         }

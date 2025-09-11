@@ -6,7 +6,7 @@
 
     <groupId>io.github.stumper66</groupId>
     <artifactId>VillagerAnnouncer</artifactId>
-    <version>1.6.0</version>
+    <version>1.6.1</version>
     <packaging>jar</packaging>
 
     <name>VillagerAnnouncer</name>
@@ -139,7 +139,7 @@
         <dependency>
             <groupId>com.discordsrv</groupId>
             <artifactId>discordsrv</artifactId>
-            <version>1.28.0</version>
+            <version>1.30.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
