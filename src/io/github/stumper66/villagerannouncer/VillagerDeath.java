@@ -182,8 +182,8 @@ public class VillagerDeath {
         final Component comp = MiniMessage.miniMessage().deserialize(text);
 
         if (useBroadcast) {
-            if (main.discordSRVManager.getIsInstalled())
-                main.discordSRVManager.sendMessage(comp);
+            if (main.discordInterface != null && main.discordInterface.getIsInstalled())
+                main.discordInterface.sendMessage(comp);
         }
 
         if (main.config.getBoolean("log-messages-to-console")){

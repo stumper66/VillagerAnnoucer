@@ -8,8 +8,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-public class DiscordSRVManager {
-    public Boolean isInstalled;
+public class DiscordSRVManager implements DiscordInterface {
+    private Boolean isInstalled;
     public boolean mainChannelWasNull;
 
     public boolean getIsInstalled(){

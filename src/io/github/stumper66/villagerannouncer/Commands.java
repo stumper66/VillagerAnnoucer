@@ -44,10 +44,10 @@ public class Commands implements CommandExecutor, TabCompleter {
             return;
         }
 
-        final DiscordSRVManager srv = VillagerAnnouncer.getInstance().discordSRVManager;
+        final DiscordInterface srv = VillagerAnnouncer.getInstance().discordInterface;
 
-        if (!srv.getIsInstalled()){
-            sender.sendMessage("DiscordSRV is not installed or enabled");
+        if (srv == null || !srv.getIsInstalled()){
+            sender.sendMessage("A supported Discord plugin is not installed or enabled");
             return;
         }
 
@@ -89,8 +89,9 @@ public class Commands implements CommandExecutor, TabCompleter {
             return;
         }
 
-        VillagerAnnouncer.getInstance().loadConfig(sender);
-        VillagerAnnouncer.getInstance().discordSRVManager.reset();
+        VillagerAnnouncer main = VillagerAnnouncer.getInstance();
+        main.loadConfig(sender);
+        if (main.discordInterface != null) main.discordInterface.reset();
         sender.sendMessage("Reloaded the config");
     }
 

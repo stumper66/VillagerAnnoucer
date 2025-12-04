@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.FileUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -30,7 +31,10 @@ public class VillagerAnnouncer extends JavaPlugin {
     private boolean isRunningPaper;
     SoundInfo soundsNormal;
     SoundInfo soundsWanderingTrader;
-    DiscordSRVManager discordSRVManager;
+    private DiscordSRVManager discordSRVManager;
+    private EssentialsXDiscord essentialsXDiscord;
+    @Nullable DiscordInterface discordInterface;
+    DiscordPluginName discordPluginName = DiscordPluginName.NONE;
     public BukkitAudiences adventure;
 
     @Override
@@ -48,8 +52,25 @@ public class VillagerAnnouncer extends JavaPlugin {
         loadConfig(null);
         registerListeners();
         discordSRVManager = new DiscordSRVManager();
+        essentialsXDiscord = new EssentialsXDiscord();
+        checkForDiscordPlugins();
 
         Log.inf("Villager Announcer loaded");
+    }
+
+    private void checkForDiscordPlugins(){
+        if (discordSRVManager.getIsInstalled()) {
+            this.discordPluginName = DiscordPluginName.DISCORDSRV;
+            discordInterface = discordSRVManager;
+            Log.inf("Found discord plugin: DiscordSRV");
+        }
+        else if (essentialsXDiscord.getIsInstalled()) {
+            this.discordPluginName = DiscordPluginName.ESSENTIALSX_DISCORD;
+            discordInterface = essentialsXDiscord;
+            Log.inf("Found discord plugin: EssentialsX Discord");
+        }
+        else
+            this.discordPluginName = DiscordPluginName.NONE;
     }
 
     private void checkForPaper(){
@@ -82,6 +103,7 @@ public class VillagerAnnouncer extends JavaPlugin {
             new Yaml().load(fs);
         } catch (final Exception e) {
             Log.war("Unable to parse config.yml");
+            //noinspection CallToPrintStackTrace
             e.printStackTrace();
             config = new YamlConfiguration();
             return;
