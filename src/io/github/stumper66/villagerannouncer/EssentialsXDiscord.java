@@ -99,10 +99,6 @@ public class EssentialsXDiscord implements DiscordInterface {
             Log.war("Unable to get EssentialsXDiscord method: " + e.getMessage());
         }
 
-        /*
-        channel = MessageType.DefaultTypes.CHAT;
-        api = Bukkit.getServicesManager().load(DiscordService.class);
-        */
         checkedApi = true;
     }
 

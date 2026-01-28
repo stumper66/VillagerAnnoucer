@@ -185,20 +185,18 @@ public class VillagerAnnouncer extends JavaPlugin {
         return instance;
     }
 
-    public boolean isSoundMuted(final Player player) {
-        Byte v = player.getPersistentDataContainer()
+    public boolean isSoundMuted(final @NotNull Player player) {
+        final Byte v = player.getPersistentDataContainer()
                 .get(keyMuteSound, PersistentDataType.BYTE);
         return v != null && v == (byte) 1;
     }
 
-    public boolean toggleSoundMuted(final Player player) {
-        boolean nowMuted = !isSoundMuted(player);
+    public void toggleSoundMuted(final @NotNull Player player, final boolean doMute) {
         player.getPersistentDataContainer().set(
                 keyMuteSound,
                 PersistentDataType.BYTE,
-                nowMuted ? (byte) 1 : (byte) 0
+                doMute ? (byte) 1 : (byte) 0
         );
-        return nowMuted;
     }
 
     @Override

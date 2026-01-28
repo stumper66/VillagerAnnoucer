@@ -18,27 +18,14 @@ public class Commands implements CommandExecutor, TabCompleter {
     private List<String> soundNameSuggestions;
 
     public boolean onCommand(final @NotNull CommandSender sender, final @NotNull Command command, final @NotNull String label, final String @NotNull [] args) {
-        if (args.length >= 1 && args[0].equalsIgnoreCase("toggle")) {
-            if (!(sender instanceof Player player)) {
-                sender.sendMessage("Command must be run by a player");
-                return true;
-            }
-
-            if (!player.hasPermission("villagerannouncer.toggle")) {
-                player.sendMessage("Access denied");
-                return true;
-            }
-
-            boolean muted = VillagerAnnouncer.getInstance().toggleSoundMuted(player);
-            player.sendMessage("VillagerAnnouncer sounds: " + (muted ? "MUTED" : "ON"));
-            return true;
-        }
         if (!sender.hasPermission("villagerannouncer")){
             sender.sendMessage("Access denied");
             return true;
         }
 
-        if (args.length >= 1 && "reload".equalsIgnoreCase(args[0]))
+        if (args.length >= 1 && args[0].equalsIgnoreCase("toggle"))
+            doPlayerMute(sender, label, args);
+        else if (args.length >= 1 && "reload".equalsIgnoreCase(args[0]))
             doReload(sender);
         else if (args.length >= 1 && "test-chat".equalsIgnoreCase(args[0]))
             doTestChat(sender);
@@ -48,9 +35,45 @@ public class Commands implements CommandExecutor, TabCompleter {
         }
         else
             sender.sendMessage("Villager Announcer " + VillagerAnnouncer.getInstance().getDescription().getVersion() +
-                    "\nOptions: reload / test-sound");
+                    "\nOptions: reload / test-chat / test-sound / toggle");
 
         return true;
+    }
+
+    private void doPlayerMute(final @NotNull CommandSender sender, final @NotNull String label, final String @NotNull [] args){
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage("Command must be run by a player");
+            return;
+        }
+
+        if (!player.hasPermission("villagerannouncer.toggle")) {
+            player.sendMessage("Access denied");
+            return;
+        }
+
+        boolean muted = false;
+        boolean showOptions = false;
+
+        if (args.length >= 2 && "mute".equalsIgnoreCase(args[1])){
+            VillagerAnnouncer.getInstance().toggleSoundMuted(player, true);
+            muted = true;
+        }
+        else if (args.length >= 2 && "unmute".equalsIgnoreCase(args[1]))
+            VillagerAnnouncer.getInstance().toggleSoundMuted(player, false);
+        else {
+            muted = VillagerAnnouncer.getInstance().isSoundMuted(player);
+            showOptions = true;
+        }
+
+        String msg = "VillagerAnnouncer sounds: " + (muted ? "&aMUTED&r" : "&9NOT MUTED&r");
+        if (showOptions) {
+            if (muted)
+                msg += "\nTo unmute run &7/" + label + " toggle unmute&r";
+            else
+                msg += "\nTo mute run &7/" + label + " toggle mute&r";
+        }
+
+        player.sendMessage(MessageUtils.colorizeAll(msg));
     }
 
     private void doTestChat(final @NotNull CommandSender sender){
@@ -112,18 +135,25 @@ public class Commands implements CommandExecutor, TabCompleter {
 
     @Override
     public @Nullable List<String> onTabComplete(final @NotNull CommandSender sender, final @NotNull Command command, final @NotNull String label, final @NotNull String @NotNull [] args){
+        final boolean hasTogglePerms = sender.hasPermission("villagerannouncer.toggle");
+        final boolean hasTestSoundPerms = sender.hasPermission("villagerannouncer.test-sound");
+
         if (args.length == 1) {
             final List<String> suggestions = new LinkedList<>();
             if (sender.hasPermission("villagerannouncer.reload"))
                 suggestions.add("reload");
-            if (sender.hasPermission("villagerannouncer.test-sound"))
+            if (hasTestSoundPerms)
                 suggestions.add("test-sound");
             if (sender.hasPermission("villagerannouncer.test-chat"))
                 suggestions.add("test-chat");
+            if (hasTogglePerms)
+                suggestions.add("toggle");
 
             return suggestions;
         }
-        else if (args.length == 2){
+        else if (hasTogglePerms && args.length == 2 && "toggle".equalsIgnoreCase(args[0]))
+            return List.of("mute", "unmute");
+        else if (hasTestSoundPerms && args.length == 2 && "test-sound".equalsIgnoreCase(args[0])){
             if (soundNameSuggestions == null) buildSoundNames();
             return soundNameSuggestions;
         }
