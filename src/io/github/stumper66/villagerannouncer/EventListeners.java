@@ -57,7 +57,7 @@ public class EventListeners implements Listener {
         }
 
         if (event.getEntity().getType() == EntityType.WANDERING_TRADER){
-            if (VillagerAnnouncer.getInstance().config.getBoolean("include-wandering-trader"))
+            if (!VillagerAnnouncer.getInstance().config.getBoolean("include-wandering-trader"))
                 return;
         }
 
