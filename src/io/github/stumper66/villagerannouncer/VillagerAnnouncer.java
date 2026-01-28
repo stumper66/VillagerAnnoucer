@@ -19,6 +19,12 @@ import java.io.FileInputStream;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+// Meechie's Toggle
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+import org.bukkit.configuration.file.FileConfiguration;
 
 public class VillagerAnnouncer extends JavaPlugin {
     private static VillagerAnnouncer instance;
@@ -37,6 +43,11 @@ public class VillagerAnnouncer extends JavaPlugin {
     DiscordPluginName discordPluginName = DiscordPluginName.NONE;
     public BukkitAudiences adventure;
 
+    // Meechie's Toggle -- pb loves Meechie
+    private final Set<UUID> mutedPlayers = new HashSet<>();
+    private File mutedFile;
+    private FileConfiguration mutedConfig;
+
     @Override
     public void onLoad() {
         instance = this;
@@ -48,8 +59,10 @@ public class VillagerAnnouncer extends JavaPlugin {
         keyWasVillager = new NamespacedKey(this, "wasvillager");
         keyTraders = new NamespacedKey(this, "traders");
         checkForPaper();
+        // Meechie Toggle --- pb loved old men
         registerCommands();
         loadConfig(null);
+        loadMutedPlayers();
         registerListeners();
         discordSRVManager = new DiscordSRVManager();
         essentialsXDiscord = new EssentialsXDiscord();
@@ -140,6 +153,68 @@ public class VillagerAnnouncer extends JavaPlugin {
             onlyBroadcastIfTradedWith = false;
         }
     }
+    // Meechie's Toggle --- hi pb!
+    private void loadMutedPlayers() {
+        if (!getDataFolder().exists()) {
+            getDataFolder().mkdirs();
+        }
+
+        mutedFile = new File(getDataFolder(), "muted.yml");
+        if (!mutedFile.exists()) {
+            try {
+                mutedFile.createNewFile();
+            } catch (IOException e) {
+                Log.war("Unable to create muted.yml");
+                e.printStackTrace();
+            }
+        }
+
+        mutedConfig = YamlConfiguration.loadConfiguration(mutedFile);
+        mutedPlayers.clear();
+
+        for (String s : mutedConfig.getStringList("muted")) {
+            try {
+                mutedPlayers.add(UUID.fromString(s));
+            } catch (IllegalArgumentException ignored) {
+                Log.war("Invalid UUID in muted.yml: " + s);
+            }
+        }
+    }
+
+    private void saveMutedPlayers() {
+        if (mutedConfig == null || mutedFile == null) return;
+
+        List<String> out = mutedPlayers.stream().map(UUID::toString).toList();
+        mutedConfig.set("muted", out);
+
+        try {
+            mutedConfig.save(mutedFile);
+        } catch (IOException e) {
+            Log.war("Unable to save muted.yml");
+            e.printStackTrace();
+        }
+    }
+// Meechie Toggle n stuffs
+    public boolean isMuted(@NotNull Player player) {
+        return mutedPlayers.contains(player.getUniqueId());
+    }
+
+        public boolean toggleMuted(@NotNull Player player) {
+            UUID id = player.getUniqueId();
+            boolean nowMuted;
+
+            if (mutedPlayers.contains(id)) {
+                mutedPlayers.remove(id);
+                nowMuted = false;
+            } else {
+                mutedPlayers.add(id);
+                nowMuted = true;
+            }
+
+            saveMutedPlayers();
+            return nowMuted;
+        }
+
 
     private void parseSoundConfig(){
         this.soundsNormal = new SoundInfo();

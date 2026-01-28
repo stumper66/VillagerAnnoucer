@@ -20,3 +20,7 @@ permissions:
   villagerannouncer.*:
     description: 'Access to all Villager Announcer commands.'
     default: op
+
+  villagerannouncer.toggle:
+    description: 'Allow player to toggle villager announcements on/off'
+    default: true

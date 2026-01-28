@@ -31,9 +31,30 @@ public class Commands implements CommandExecutor, TabCompleter {
             final String soundName = args.length >= 2 ? args[1] : null;
             doTestSound(sender, soundName);
         }
+        //Meechie toggle?
+        else if (args.length >= 1 && "toggle".equalsIgnoreCase(args[0])) {
+
+            if (!(sender instanceof Player player)) {
+                sender.sendMessage("Command must be run by a player");
+                return true;
+            }
+
+            if (!player.hasPermission("villagerannouncer.toggle")) {
+                player.sendMessage("Access denied");
+                return true;
+            }
+
+            boolean nowMuted = VillagerAnnouncer.getInstance().toggleMuted(player);
+            player.sendMessage(
+                    nowMuted
+                            ? "Villager Announcer disabled."
+                            : "Villager Announcer enabled."
+            );
+        }
+
         else
             sender.sendMessage("Villager Announcer " + VillagerAnnouncer.getInstance().getDescription().getVersion() +
-                    "\nOptions: reload / test-sound");
+                    "\nOptions: reload / test-sound / toggle");
 
         return true;
     }
@@ -103,8 +124,9 @@ public class Commands implements CommandExecutor, TabCompleter {
                 suggestions.add("reload");
             if (sender.hasPermission("villagerannouncer.test-sound"))
                 suggestions.add("test-sound");
-            if (sender.hasPermission("villagerannouncer.test-chat"))
-                suggestions.add("test-chat");
+            // this works like Dalcyns wifi
+            if (sender.hasPermission("villagerannouncer.toggle"))
+                suggestions.add("toggle");
 
             return suggestions;
         }
