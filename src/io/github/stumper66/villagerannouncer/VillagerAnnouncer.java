@@ -19,11 +19,14 @@ import java.io.FileInputStream;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import org.bukkit.persistence.PersistentDataType;
+
 
 public class VillagerAnnouncer extends JavaPlugin {
     private static VillagerAnnouncer instance;
     NamespacedKey keyWasVillager;
     NamespacedKey keyTraders;
+    public NamespacedKey keyMuteSound;
     public YamlConfiguration config;
     boolean playSound;
     boolean isEnabled;
@@ -47,6 +50,7 @@ public class VillagerAnnouncer extends JavaPlugin {
         this.adventure = BukkitAudiences.create(this);
         keyWasVillager = new NamespacedKey(this, "wasvillager");
         keyTraders = new NamespacedKey(this, "traders");
+        keyMuteSound = new NamespacedKey(this, "mute_sound");
         checkForPaper();
         registerCommands();
         loadConfig(null);
@@ -179,6 +183,22 @@ public class VillagerAnnouncer extends JavaPlugin {
 
     public static VillagerAnnouncer getInstance(){
         return instance;
+    }
+
+    public boolean isSoundMuted(final Player player) {
+        Byte v = player.getPersistentDataContainer()
+                .get(keyMuteSound, PersistentDataType.BYTE);
+        return v != null && v == (byte) 1;
+    }
+
+    public boolean toggleSoundMuted(final Player player) {
+        boolean nowMuted = !isSoundMuted(player);
+        player.getPersistentDataContainer().set(
+                keyMuteSound,
+                PersistentDataType.BYTE,
+                nowMuted ? (byte) 1 : (byte) 0
+        );
+        return nowMuted;
     }
 
     @Override

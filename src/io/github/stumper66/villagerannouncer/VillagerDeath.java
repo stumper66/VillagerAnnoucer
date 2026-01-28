@@ -205,11 +205,12 @@ public class VillagerDeath {
 
             main.adventure.player(player).sendMessage(comp);
 
-            if (main.playSound){
-                final SoundInfo soundInfo = info.isNormalVillager ?
-                        main.soundsNormal : main.soundsWanderingTrader;
-                final Sound sound = soundInfo.getSoundToBePlayed();
+            if (main.playSound && !main.isSoundMuted(player)) {
+                final SoundInfo soundInfo = info.isWanderingTrader
+                        ? main.soundsWanderingTrader
+                        : main.soundsNormal;
 
+                final Sound sound = soundInfo.getSoundToBePlayed();
                 if (sound != null)
                     player.playSound(player.getLocation(), sound, 1f, 1f);
             }

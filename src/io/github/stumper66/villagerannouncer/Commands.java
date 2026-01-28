@@ -18,6 +18,21 @@ public class Commands implements CommandExecutor, TabCompleter {
     private List<String> soundNameSuggestions;
 
     public boolean onCommand(final @NotNull CommandSender sender, final @NotNull Command command, final @NotNull String label, final String @NotNull [] args) {
+        if (args.length >= 1 && args[0].equalsIgnoreCase("toggle")) {
+            if (!(sender instanceof Player player)) {
+                sender.sendMessage("Command must be run by a player");
+                return true;
+            }
+
+            if (!player.hasPermission("villagerannouncer.toggle")) {
+                player.sendMessage("Access denied");
+                return true;
+            }
+
+            boolean muted = VillagerAnnouncer.getInstance().toggleSoundMuted(player);
+            player.sendMessage("VillagerAnnouncer sounds: " + (muted ? "MUTED" : "ON"));
+            return true;
+        }
         if (!sender.hasPermission("villagerannouncer")){
             sender.sendMessage("Access denied");
             return true;

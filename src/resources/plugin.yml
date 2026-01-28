@@ -20,3 +20,9 @@ permissions:
   villagerannouncer.*:
     description: 'Access to all Villager Announcer commands.'
     default: op
+    children:
+      villagerannouncer.toggle: true
+
+  villagerannouncer.toggle:
+    description: 'Allows a player to toggle Villager Announcer sounds for themselves.'
+    default: true
