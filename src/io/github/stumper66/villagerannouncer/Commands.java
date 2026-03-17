@@ -124,9 +124,8 @@ public class Commands implements CommandExecutor, TabCompleter {
 
         msg = msg.replace("%label%", label);
 
-        final VillagerAnnouncer main = VillagerAnnouncer.getInstance();
         final Component comp = MiniMessage.miniMessage().deserialize(msg);
-        main.adventure.sender(sender).sendMessage(comp);
+        sender.sendMessage(comp);
     }
 
     private void doTestChat(final @NotNull CommandSender sender){

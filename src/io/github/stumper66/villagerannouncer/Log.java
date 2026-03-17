@@ -2,26 +2,12 @@ package io.github.stumper66.villagerannouncer;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 
 import java.util.logging.Logger;
 
 public class Log {
     private final static Logger log = Logger.getLogger("VillagerAnnouncer");
-    private final static String PREFIX = "[VillagerAnnouncer] ";
-    private static Boolean isRunningSpigot;
-
-    private static boolean getIsRunningSpigot(){
-        if (isRunningSpigot == null) {
-            try {
-                Class.forName("net.md_5.bungee.api.ChatColor");
-                isRunningSpigot = true;
-            } catch (ClassNotFoundException ignored) {
-                isRunningSpigot = false;
-            }
-        }
-
-        return isRunningSpigot;
-    }
 
     // use this function for testing messages so you will remember to remove them later
     @Deprecated()
@@ -30,9 +16,8 @@ public class Log {
     }
 
     public static void inf(final String text){
-        final VillagerAnnouncer main = VillagerAnnouncer.getInstance();
         final Component comp = MiniMessage.miniMessage().deserialize(text);
-        main.adventure.console().sendMessage(comp);
+        Bukkit.getConsoleSender().sendMessage(comp);
     }
 
     public static void war(final String text){
