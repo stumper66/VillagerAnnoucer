@@ -1,6 +1,8 @@
 package io.github.stumper66.villagerannouncer;
 
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -117,7 +119,7 @@ public class VillagerAnnouncer extends JavaPlugin {
         config.options().copyDefaults(true);
         final int fileVersion = config.getInt("file-version");
 
-        if (fileVersion < 7){
+        if (fileVersion < 8){
             // copy to old file
             final File backedupFile = new File(getDataFolder(),
                     "config.yml.v" + fileVersion + ".old");
@@ -139,8 +141,11 @@ public class VillagerAnnouncer extends JavaPlugin {
         if (onlyBroadcastIfTradedWith && !isRunningPaper){
             final String msg = "only-broadcast-if-traded-with is a Paper only feature and will be disabled since this server is not a Paper server.";
             Log.war(msg);
-            if (whoReloaded instanceof Player)
-                whoReloaded.sendMessage(MessageUtils.colorizeAll("VillagerAnnouncer: &c") + msg);
+            if (whoReloaded instanceof Player) {
+                final Component comp = MiniMessage.miniMessage().deserialize(
+                        "VillagerAnnouncer: <color:red>" + msg);
+                adventure.sender(whoReloaded).sendMessage(comp);
+            }
             onlyBroadcastIfTradedWith = false;
         }
     }

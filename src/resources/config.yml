@@ -32,12 +32,24 @@ include-wandering-trader: false
 # messages are formatted with MiniMessage
 # for information go to https://docs.advntr.dev/minimessage/format.html
 messages:
-  # all four of these settings will populate the %villager% variable:
+  # --------- all of these below will populate the %villager% variable: -----------
   villager: 'villager'
+  nametagged-villager: 'villager (%customname%)'
   baby-villager: 'baby villager'
+  nametagged-baby-villager: 'baby villager (%customname%)'
   zombie-villager: 'zombie villager'
+  nametagged-zombie-villager: 'zombie villager (%customname%)'
   baby-zombie-villager: 'baby zombie villager'
+  nametagged-baby-zombie-villager: 'baby zombie villager (%customname%)'
   wandering-trader: 'wandering trader'
+  nametagged-wandering-trader: 'wandering trader (%customname%)'
+  # ---------------------------------------------------------------------------------
+
+  toggle-status-muted: 'VillagerAnnouncer sounds: <color:green>MUTED<reset>'
+  toggle-status-not-muted: 'VillagerAnnouncer sounds: <color:blue>NOT MUTED<reset>'
+  # these get appended to the messages above:
+  toggle-option-mute: '<newline>To mute run <color:gray>/%label% toggle mute<reset>'
+  toggle-option-unmute: '<newline>To unmute run <color:gray>/%label% toggle unmute<reset>'
 
   # populates %location% variable:
   location: '<reset>( <color:gold>XYZ: %x% %y% %z%, <color:yellow>in <color:green>%world-name%</color>)'
@@ -67,4 +79,4 @@ messages:
 # %villager-experience%
 # %villager-type%
 
-file-version: 7
+file-version: 8

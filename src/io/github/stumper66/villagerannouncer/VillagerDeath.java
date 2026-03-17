@@ -75,16 +75,7 @@ public class VillagerDeath {
             return;
         }
 
-        String villager;
-        if (info.isNormalVillager && info.isAdult)
-            villager = messages.getString("villager", "villager");
-        else if (info.isNormalVillager && !info.isAdult)
-            villager = messages.getString("baby-villager", "baby villager");
-        else if (!info.isNormalVillager && info.isAdult)
-            villager = messages.getString("zombie-villager", "zombie villager");
-        else
-            villager = messages.getString("baby-zombie-villager", "baby zombie villager");
-
+        final String villager = populateVillagerString(messages);
         final String wanderingTrader = messages.getString("wandering-trader", "wandering trader");
         final StringReplacer location = new StringReplacer(messages.getString("location", "&r( &6XYZ: %x% %y% %z%, &r&ein &r&a%world-name%&r)"));
         final Location loc = entity.getLocation();
@@ -138,8 +129,35 @@ public class VillagerDeath {
         );
 
         mainMessage.replaceIfExists("%wandering-trader%", () -> wanderingTrader);
+        mainMessage.replaceIfExists("%customname%", () -> info.getCustomName());
 
         runBroadcast(mainMessage.text);
+    }
+
+    private @NotNull String populateVillagerString(@NotNull ConfigurationSection messages){
+        String customName = info.getCustomName();
+        String keyName;
+        String defaultValue;
+
+        if (info.isNormalVillager) {
+            keyName = info.isAdult ?
+                    "villager" : "baby-villager";
+            defaultValue = info.isAdult ?
+                    "villager" : "baby villager";
+        }
+        else{
+            keyName = info.isAdult ?
+                    "zombie-villager" : "baby-zombie-villager";
+            defaultValue = info.isAdult ?
+                    "zombie villager" : "baby zombie villager";
+        }
+
+        if (!customName.isEmpty()) {
+            keyName = "nametagged-" + keyName;
+            defaultValue += " (%customname%)";
+        }
+
+        return messages.getString(keyName, defaultValue);
     }
 
     private @NotNull String capitalize(@NotNull final String str) {
