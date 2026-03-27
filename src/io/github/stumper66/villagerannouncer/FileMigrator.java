@@ -267,7 +267,7 @@ public class FileMigrator {
                                                 padding + "- " + oldValue; // + "\r\n" + line;
                                         newConfigLines.add(currentLine + 1, newline);
                                         Log.inf(
-                                                "&fFile Loader: &8(Migration) &7Added array value: &b"
+                                                "<white>File Loader: <dark_gray>(Migration) <gray>Added array value: <aqua>"
                                                         + oldValue);
                                     }
                                 }
@@ -288,9 +288,9 @@ public class FileMigrator {
                                                             + fi.simpleValue;
                                             newConfigLines.add(currentLine + 1, newline);
                                             Log.inf(
-                                                    "&fFile Loader: &8(Migration) &7Adding key: &b"
-                                                            + enumeratedKey + "&7, value: &r"
-                                                            + fi.simpleValue + "&7.");
+                                                    "<white>File Loader: <dark_gray>(Migration) <gray>Adding key: <aqua>"
+                                                            + enumeratedKey + "<gray>, value: <reset>"
+                                                            + fi.simpleValue + "<gray>.");
 
                                             processedKeys.add(key);
                                         }
@@ -333,9 +333,9 @@ public class FileMigrator {
                                         padding + getEndingKey(oldValue) + ": " + fiOld.simpleValue;
                                 newConfigLines.add(currentLine + 1, newline);
                                 Log.inf(
-                                        "&fFile Loader: &8(Migration) &7Adding key: &b"
-                                                + oldValue + "&7, value: &r" + fiOld.simpleValue
-                                                + "&7.");
+                                        "<white>File Loader: <dark_gray>(Migration) <gray>Adding key: <aqua>"
+                                                + oldValue + "<gray>, value: <reset>" + fiOld.simpleValue
+                                                + "<gray>.");
                             }
                             processedKeys.add(parentKey);
                         }
@@ -344,9 +344,9 @@ public class FileMigrator {
                             if (migratedValue != null) {
                                 valuesUpdated++;
                                 Log.inf(
-                                        "&fFile Loader: &8(Migration) &7Current key: &b" + key
-                                                + "&7, replacing: &r" + value + "&7, with: &r"
-                                                + migratedValue + "&7.");
+                                        "<white>File Loader: <dark_gray>(Migration) <gray>Current key: <aqua>" + key
+                                                + "<gray>, replacing: <reset>" + value + "<gray>, with: <reset>"
+                                                + migratedValue + "<gray>.");
 
                                 line = line.replace(value, migratedValue);
                                 newConfigLines.set(currentLine, line);
@@ -365,8 +365,8 @@ public class FileMigrator {
                         newConfigLines.remove(currentLine);
                         currentLine--;
                         Log.inf(
-                                "&fFile Loader: &8(Migration) &7Current key: &b" + key
-                                        + "&7, removing value: &r" + value + "&7.");
+                                "<white>File Loader: <dark_gray>(Migration) <gray>Current key: <aqua>" + key
+                                        + "<gray>, removing value: <reset>" + value + "<gray>.");
                     }
                 }
             } // loop to next line
@@ -374,9 +374,9 @@ public class FileMigrator {
             Files.write(to.toPath(), newConfigLines, StandardCharsets.UTF_8,
                     StandardOpenOption.TRUNCATE_EXISTING);
             Log.inf(
-                    "&fFile Loader: &8(Migration) &7Migrated &b" + to.getName() + "&7 successfully.");
+                    "<white>File Loader: <dark_gray>(Migration) <gray>Migrated <aqua>" + to.getName() + "<gray> successfully.");
             Log.inf(String.format(
-                    "&fFile Loader: &8(Migration) &7Keys matched: &b%s&7, values matched: &b%s&7, values updated: &b%s&7.",
+                    "<white>File Loader: <dark_gray>(Migration) <gray>Keys matched: <aqua>%s<gray>, values matched: <aqua>%s<gray>, values updated: <aqua>%s<gray>.",
                     keysMatched, valuesMatched, valuesUpdated));
         } catch (final Exception e) {
             Log.war("File Loader: (Migration) Failed to migrate " + to.getName()

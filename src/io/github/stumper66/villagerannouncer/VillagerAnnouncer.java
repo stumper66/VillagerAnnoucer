@@ -1,6 +1,7 @@
 package io.github.stumper66.villagerannouncer;
 
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -19,6 +20,9 @@ import java.io.FileInputStream;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.bukkit.persistence.PersistentDataType;
 
 
@@ -38,7 +42,6 @@ public class VillagerAnnouncer extends JavaPlugin {
     private EssentialsXDiscord essentialsXDiscord;
     @Nullable DiscordInterface discordInterface;
     DiscordPluginName discordPluginName = DiscordPluginName.NONE;
-    public BukkitAudiences adventure;
 
     @Override
     public void onLoad() {
@@ -47,7 +50,11 @@ public class VillagerAnnouncer extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        this.adventure = BukkitAudiences.create(this);
+        if (!checkForMiniMessage()){
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
         keyWasVillager = new NamespacedKey(this, "wasvillager");
         keyTraders = new NamespacedKey(this, "traders");
         keyMuteSound = new NamespacedKey(this, "mute_sound");
@@ -60,6 +67,17 @@ public class VillagerAnnouncer extends JavaPlugin {
         checkForDiscordPlugins();
 
         Log.inf("Villager Announcer loaded");
+    }
+
+    private boolean checkForMiniMessage(){
+        try{
+            Class.forName("net.kyori.adventure.text.minimessage.MiniMessage");
+            return true;
+        } catch (ClassNotFoundException ignored) {}
+
+        Logger logger = Logger.getLogger("VillagerAnnouncer");
+        logger.log(Level.SEVERE, "MiniMessage was not found. This server version is likely not supported.");
+        return false;
     }
 
     private void checkForDiscordPlugins(){
@@ -93,7 +111,7 @@ public class VillagerAnnouncer extends JavaPlugin {
     private void registerCommands(){
         final PluginCommand cmd = getCommand("villagerannouncer");
         if (cmd == null)
-            Log.inf("VillagerAnnouncer: Command &b/villageranouncer&7 is unavailable, is it not registered in plugin.yml?");
+            Log.inf("VillagerAnnouncer: Command <aqua>/villageranouncer<gray> is unavailable, is it not registered in plugin.yml?");
         else
             cmd.setExecutor(new Commands());
     }
@@ -117,12 +135,12 @@ public class VillagerAnnouncer extends JavaPlugin {
         config.options().copyDefaults(true);
         final int fileVersion = config.getInt("file-version");
 
-        if (fileVersion < 7){
+        if (fileVersion < 8){
             // copy to old file
             final File backedupFile = new File(getDataFolder(),
                     "config.yml.v" + fileVersion + ".old");
             FileUtil.copy(file, backedupFile);
-            Log.inf("&fFile Loader: &8(Migration) &bconfig.yml backed up to "
+            Log.inf("<white>File Loader: <dark_gray>(Migration) <aqua>config.yml backed up to "
                     + backedupFile.getName());
 
             saveResource(file.getName(), true);
@@ -139,8 +157,11 @@ public class VillagerAnnouncer extends JavaPlugin {
         if (onlyBroadcastIfTradedWith && !isRunningPaper){
             final String msg = "only-broadcast-if-traded-with is a Paper only feature and will be disabled since this server is not a Paper server.";
             Log.war(msg);
-            if (whoReloaded instanceof Player)
-                whoReloaded.sendMessage(MessageUtils.colorizeAll("VillagerAnnouncer: &c") + msg);
+            if (whoReloaded instanceof Player) {
+                final Component comp = MiniMessage.miniMessage().deserialize(
+                        "VillagerAnnouncer: <color:red>" + msg);
+                whoReloaded.sendMessage(comp);
+            }
             onlyBroadcastIfTradedWith = false;
         }
     }
@@ -201,9 +222,6 @@ public class VillagerAnnouncer extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (this.adventure != null) {
-            this.adventure.close();
-            this.adventure = null;
-        }
+
     }
 }

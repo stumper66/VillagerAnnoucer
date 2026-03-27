@@ -1,10 +1,14 @@
 package io.github.stumper66.villagerannouncer;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,11 +22,6 @@ public class Commands implements CommandExecutor, TabCompleter {
     private List<String> soundNameSuggestions;
 
     public boolean onCommand(final @NotNull CommandSender sender, final @NotNull Command command, final @NotNull String label, final String @NotNull [] args) {
-        if (!sender.hasPermission("villagerannouncer")){
-            sender.sendMessage("Access denied");
-            return true;
-        }
-
         if (args.length >= 1 && args[0].equalsIgnoreCase("toggle"))
             doPlayerMute(sender, label, args);
         else if (args.length >= 1 && "reload".equalsIgnoreCase(args[0]))
@@ -34,10 +33,43 @@ public class Commands implements CommandExecutor, TabCompleter {
             doTestSound(sender, soundName);
         }
         else
-            sender.sendMessage("Villager Announcer " + VillagerAnnouncer.getInstance().getDescription().getVersion() +
-                    "\nOptions: reload / test-chat / test-sound / toggle");
+            showMainCommand(sender);
 
         return true;
+    }
+
+    private void showMainCommand(final @NotNull CommandSender sender){
+        final StringBuilder sb = new StringBuilder("Villager Announcer ")
+                .append(VillagerAnnouncer.getInstance().getDescription().getVersion())
+                .append("\nOptions: ");
+        final String[] cmds = {"reload", "test-chat", "test-sound", "toggle"};
+
+        List<String> allowedCmds = new ArrayList<>();
+        if (sender instanceof Player player) {
+            for (String cmd : cmds){
+                if (player.hasPermission("villagerannouncer." + cmd))
+                    allowedCmds.add(cmd);
+            }
+
+            if (allowedCmds.isEmpty()){
+                player.sendMessage("Access denied");
+                return;
+            }
+
+            for (int i = 0; i < allowedCmds.size(); i++) {
+                if (i > 0) sb.append(" / ");
+                sb.append(allowedCmds.get(i));
+            }
+
+            sender.sendMessage(sb.toString());
+        }
+        else {
+            for (int i = 0; i < cmds.length; i++) {
+                if (i > 0) sb.append(" / ");
+                sb.append(cmds[i]);
+            }
+            sender.sendMessage(sb.toString());
+        }
     }
 
     private void doPlayerMute(final @NotNull CommandSender sender, final @NotNull String label, final String @NotNull [] args){
@@ -65,15 +97,35 @@ public class Commands implements CommandExecutor, TabCompleter {
             showOptions = true;
         }
 
-        String msg = "VillagerAnnouncer sounds: " + (muted ? "&aMUTED&r" : "&9NOT MUTED&r");
-        if (showOptions) {
-            if (muted)
-                msg += "\nTo unmute run &7/" + label + " toggle unmute&r";
-            else
-                msg += "\nTo mute run &7/" + label + " toggle mute&r";
+        final YamlConfiguration config = VillagerAnnouncer.getInstance().config;
+        final ConfigurationSection messages = config.getConfigurationSection("messages");
+        if (messages == null){
+            Log.war("Messages section in config.yml is null");
+            return;
         }
 
-        player.sendMessage(MessageUtils.colorizeAll(msg));
+        String keyName = muted ? "toggle-status-muted" : "toggle-status-not-muted";
+        String defaultValue = "VillagerAnnouncer sounds: " + (muted ? "&aMUTED&r" : "&9NOT MUTED&r");
+
+        String msg = messages.getString(keyName, defaultValue);
+
+        if (showOptions) {
+            if (muted) {
+                keyName = "toggle-option-unmute";
+                defaultValue = "<newline>To unmute run <color:gray>/" + label + " toggle unmute<reset>";
+            }
+            else {
+                keyName = "toggle-option-mute";
+                defaultValue = "<newline>To mute run <color:gray>/" + label + " toggle mute<reset>";
+            }
+
+            msg += messages.getString(keyName, defaultValue);
+        }
+
+        msg = msg.replace("%label%", label);
+
+        final Component comp = MiniMessage.miniMessage().deserialize(msg);
+        sender.sendMessage(comp);
     }
 
     private void doTestChat(final @NotNull CommandSender sender){

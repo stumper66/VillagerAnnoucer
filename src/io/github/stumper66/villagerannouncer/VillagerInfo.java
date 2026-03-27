@@ -60,4 +60,10 @@ public class VillagerInfo {
         else
             return 0;
     }
+
+    public @NotNull String getCustomName(){
+        @SuppressWarnings("deprecation")
+        final String customName = entity.getCustomName();
+        return customName == null ? "" : customName;
+    }
 }

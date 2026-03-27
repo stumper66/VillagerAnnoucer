@@ -7,11 +7,19 @@ You can change the options in config.yml:
 ```yaml
 enabled: true
 play-sound: true
+
+# can optionally use a list of sounds
 sound-name: 'ENTITY_VILLAGER_DEATH'
+sound-name-wandering-trader: 'ENTITY_WANDERING_TRADER_DEATH'
+# when using a list of sounds, it won't play the same sound
+# twice until all sounds have been played
+do-not-use-already-played-sounds: true
+# when using a sound list should the list be randomized
+randomize-sound-list: true
 
 # use 0 for unlimited radius
 max-broadcast-radius: 0
-# if you're traded with a villager previously then you will get notified
+# if you've traded with a villager previously then you will get notified
 # note this is only compatible on Paper servers
 only-broadcast-if-traded-with: false
 # optionally limit broadcasts to specific worlds
@@ -26,21 +34,45 @@ discordsrv-send-message-to-main-channel: true
 # or are using player permisisons
 log-messages-to-console: true
 
+include-wandering-trader: false
+
+# messages are formatted with MiniMessage
+# for information go to https://docs.advntr.dev/minimessage/format.html
 messages:
-  # all four of these settings will populate the %villager% variable:
+  # --------- all of these below will populate the %villager% variable: -----------
   villager: 'villager'
+  nametagged-villager: 'villager (%customname%)'
   baby-villager: 'baby villager'
+  nametagged-baby-villager: 'baby villager (%customname%)'
   zombie-villager: 'zombie villager'
+  nametagged-zombie-villager: 'zombie villager (%customname%)'
   baby-zombie-villager: 'baby zombie villager'
+  nametagged-baby-zombie-villager: 'baby zombie villager (%customname%)'
+  wandering-trader: 'wandering trader'
+  nametagged-wandering-trader: 'wandering trader (%customname%)'
+  # ---------------------------------------------------------------------------------
+
+  toggle-status-muted: 'VillagerAnnouncer sounds: <color:green>MUTED<reset>'
+  toggle-status-not-muted: 'VillagerAnnouncer sounds: <color:blue>NOT MUTED<reset>'
+  # these get appended to the messages above:
+  toggle-option-mute: '<newline>To mute run <color:gray>/%label% toggle mute<reset>'
+  toggle-option-unmute: '<newline>To unmute run <color:gray>/%label% toggle unmute<reset>'
 
   # populates %location% variable:
-  location: '&r( &6XYZ: %x% %y% %z%, &r&ein &r&a%world-name%&r)'
-  villager-message-with-profession: '&eA %villager% has died! Profession: %villager-profession%, level: %villager-level% %location%'
-  villager-message: '&eA %villager% has died! %location%'
-  villager-infection-with-profession: '&eA %villager% has been infected! Profession: %villager-profession%, level: %villager-level% %location%'
-  villager-infection: '&eA %villager% has been infected! %location%'
-  death-by-entity: '&eA %villager% was killed by %entity% %location%'
-  death-by-misc: '&eA %villager% died by %death-cause% %location%'
+  location: '<reset>( <color:gold>XYZ: %x% %y% %z%, <color:yellow>in <color:green>%world-name%</color>)'
+  # if you want a clickable link with a URL, use the example below:
+  #location: '<reset><click:OPEN_URL:http://mymapsite.com/world=%world-name%;%x%,%y%,%z%>( <color:gold>XYZ: %x% %y% %z%, <color:yellow>in <color:green>%world-name%</color>)</click>'
+
+  # this will populate the %profession% variable if the villager had a profession
+  # otherwise will be an empty string
+  villager-with-profession: ' Profession: %villager-profession%, level: %villager-level%'
+
+  villager-infection: '<color:yellow>A %villager% has been infected by %entity%! %location%%profession%'
+  death-by-entity: '<color:yellow>A %villager% was killed by %entity% %location%%profession%'
+  death-by-misc: '<color:yellow>A %villager% died by %death-cause% %location%%profession%'
+
+  wandering-trader-death: '<color:yellow>A %wandering-trader% has died! %location%'
+  wandering-trader-death-by-entity: '<color:yellow>A %wandering-trader% was brutally murdered by <color:red>%entity%<color:yellow>! %location%'
 
 # Available variables:
 # %villager%
@@ -55,7 +87,7 @@ messages:
 # %villager-experience%
 # %villager-type%
 
-file-version: 3
+file-version: 8
 ```
 
 Questions or feature suggestions? Join the [discord](https://discord.gg/arcaneplugins-752310043214479462) server.

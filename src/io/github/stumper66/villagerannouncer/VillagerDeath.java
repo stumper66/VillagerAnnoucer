@@ -75,16 +75,7 @@ public class VillagerDeath {
             return;
         }
 
-        String villager;
-        if (info.isNormalVillager && info.isAdult)
-            villager = messages.getString("villager", "villager");
-        else if (info.isNormalVillager && !info.isAdult)
-            villager = messages.getString("baby-villager", "baby villager");
-        else if (!info.isNormalVillager && info.isAdult)
-            villager = messages.getString("zombie-villager", "zombie villager");
-        else
-            villager = messages.getString("baby-zombie-villager", "baby zombie villager");
-
+        final String villager = populateVillagerString(messages);
         final String wanderingTrader = messages.getString("wandering-trader", "wandering trader");
         final StringReplacer location = new StringReplacer(messages.getString("location", "&r( &6XYZ: %x% %y% %z%, &r&ein &r&a%world-name%&r)"));
         final Location loc = entity.getLocation();
@@ -94,6 +85,7 @@ public class VillagerDeath {
         location.replaceIfExists("%world-name%", () -> Objects.requireNonNull(loc.getWorld()).getName());
         location.replaceIfExists("%world-type%", () -> Objects.requireNonNull(loc.getWorld()).getEnvironment().name());
 
+        String professionInfo = "";
         String messageTemplate;
         if (info.isWanderingTrader){
             if (info.killerEntity != null)
@@ -102,16 +94,15 @@ public class VillagerDeath {
                 messageTemplate = messages.getString("wandering-trader-death", "<color:yellow>A %wandering-trader% has died! %location%");
         }
         else {
-            if (wasInfected && info.hasProfession())
-                messageTemplate = messages.getString("villager-infection-with-profession", "<color:yellow>A %villager% has died! Profession: %villager-profession%, level: %villager-level% %location%");
-            else if (wasInfected && !info.hasProfession())
+            if (info.hasProfession())
+                professionInfo = messages.getString("villager-with-profession", " Profession: %villager-profession%, level: %villager-level%");
+            
+            if (wasInfected)
                 messageTemplate = messages.getString("villager-infection", "<color:yellow>A %villager% has died! %location%");
             else if (info.killerEntity != null)
                 messageTemplate = messages.getString("death-by-entity", "<color:yellow>A %villager% was killed by %entity% %location%");
             else if (info.damageCause != null)
                 messageTemplate = messages.getString("death-by-misc", "<color:yellow>A %villager% died by %death-cause% %location%");
-            else if (info.hasProfession())
-                messageTemplate = messages.getString("villager-infection-with-profession", "<color:yellow>A %villager% has been infected by %entity%! Profession: %villager-profession%, level: %villager-level% %location%");
             else // no infection regular death
                 messageTemplate = messages.getString("villager-infection", "<color:yellow>A %villager% has been infected by %entity%! %location%");
         }
@@ -119,6 +110,7 @@ public class VillagerDeath {
         if (info.killerEntity == null && "disabled".equalsIgnoreCase(messageTemplate)) return;
 
         final StringReplacer mainMessage = new StringReplacer(messageTemplate);
+        mainMessage.replace("%profession%", professionInfo);
         mainMessage.replaceIfExists("%location%", () -> location.text);
         mainMessage.replaceIfExists("%villager%", () -> villager);
         mainMessage.replaceIfExists("%death-cause%", () -> info.damageCause != null ? capitalize(info.damageCause.name()) : "");
@@ -138,8 +130,35 @@ public class VillagerDeath {
         );
 
         mainMessage.replaceIfExists("%wandering-trader%", () -> wanderingTrader);
+        mainMessage.replaceIfExists("%customname%", () -> info.getCustomName());
 
         runBroadcast(mainMessage.text);
+    }
+
+    private @NotNull String populateVillagerString(@NotNull ConfigurationSection messages){
+        String customName = info.getCustomName();
+        String keyName;
+        String defaultValue;
+
+        if (info.isNormalVillager) {
+            keyName = info.isAdult ?
+                    "villager" : "baby-villager";
+            defaultValue = info.isAdult ?
+                    "villager" : "baby villager";
+        }
+        else{
+            keyName = info.isAdult ?
+                    "zombie-villager" : "baby-zombie-villager";
+            defaultValue = info.isAdult ?
+                    "zombie villager" : "baby zombie villager";
+        }
+
+        if (!customName.isEmpty()) {
+            keyName = "nametagged-" + keyName;
+            defaultValue += " (%customname%)";
+        }
+
+        return messages.getString(keyName, defaultValue);
     }
 
     private @NotNull String capitalize(@NotNull final String str) {
@@ -186,9 +205,8 @@ public class VillagerDeath {
                 main.discordInterface.sendMessage(comp);
         }
 
-        if (main.config.getBoolean("log-messages-to-console")){
-            main.adventure.console().sendMessage(comp);
-        }
+        if (main.config.getBoolean("log-messages-to-console"))
+            Bukkit.getConsoleSender().sendMessage(comp);
 
         if (main.onlyBroadcastIfTradedWith){
             if (entity.getPersistentDataContainer().has(main.keyTraders, PersistentDataType.STRING))
@@ -203,7 +221,7 @@ public class VillagerDeath {
             if (requiresPermissions && !player.hasPermission(permissionName)) continue;
             if (maxRadius > 0 && !checkPlayerRadius(player, maxRadius)) continue;
 
-            main.adventure.player(player).sendMessage(comp);
+            player.sendMessage(comp);
 
             if (main.playSound && !main.isSoundMuted(player)) {
                 final SoundInfo soundInfo = info.isWanderingTrader
