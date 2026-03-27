@@ -20,6 +20,9 @@ import java.io.FileInputStream;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.bukkit.persistence.PersistentDataType;
 
 
@@ -47,6 +50,11 @@ public class VillagerAnnouncer extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        if (!checkForMiniMessage()){
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
         keyWasVillager = new NamespacedKey(this, "wasvillager");
         keyTraders = new NamespacedKey(this, "traders");
         keyMuteSound = new NamespacedKey(this, "mute_sound");
@@ -59,6 +67,17 @@ public class VillagerAnnouncer extends JavaPlugin {
         checkForDiscordPlugins();
 
         Log.inf("Villager Announcer loaded");
+    }
+
+    private boolean checkForMiniMessage(){
+        try{
+            Class.forName("net.kyori.adventure.text.minimessage.MiniMessage");
+            return true;
+        } catch (ClassNotFoundException ignored) {}
+
+        Logger logger = Logger.getLogger("VillagerAnnouncer");
+        logger.log(Level.SEVERE, "MiniMessage was not found. This server version is likely not supported.");
+        return false;
     }
 
     private void checkForDiscordPlugins(){

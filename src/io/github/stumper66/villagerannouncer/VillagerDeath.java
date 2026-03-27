@@ -95,8 +95,8 @@ public class VillagerDeath {
         }
         else {
             if (info.hasProfession())
-                professionInfo = messages.getString("villager-infection-with-profession", " Profession: %villager-profession%, level: %villager-level%");
-
+                professionInfo = messages.getString("villager-with-profession", " Profession: %villager-profession%, level: %villager-level%");
+            
             if (wasInfected)
                 messageTemplate = messages.getString("villager-infection", "<color:yellow>A %villager% has died! %location%");
             else if (info.killerEntity != null)
