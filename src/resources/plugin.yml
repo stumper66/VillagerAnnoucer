@@ -26,3 +26,7 @@ permissions:
   villagerannouncer.toggle:
     description: 'Allows a player to toggle Villager Announcer sounds for themselves.'
     default: true
+
+  villagerannouncer.ignoreplayer:
+    description: 'Players with this permission will be ignored when killing villages.'
+    default: false

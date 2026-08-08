@@ -50,6 +50,8 @@ public class VillagerDeath {
 
         info.damageEvent = entity.getLastDamageCause();
 
+        if (shouldIgnorePlayer(info)) return;
+
         if (!wasInfected && !(info.killerEntity instanceof Player)) {
             assert info.damageEvent != null;
             if ((info.damageEvent.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK
@@ -64,6 +66,16 @@ public class VillagerDeath {
         }
 
         formulateMessage();
+    }
+
+    private boolean shouldIgnorePlayer(@NotNull VillagerInfo info){
+        if (info.killerEntity instanceof Player player){
+            // if the player has this specific permission then ignore
+            return player.hasPermission("villagerannouncer.ignoreplayer")
+                    && !player.isOp();
+        }
+
+        return false;
     }
 
     @SuppressWarnings("deprecation")
